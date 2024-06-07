@@ -358,7 +358,7 @@ class SMART_Challenge_Data(SMART_Data):
         q_enc[:min(gv.max_qlen, len(q_feat)), :] = q_feat
 
         opts = [puzzle[key] for key in ["A", "B", "C", "D", "E"]]
-        return im, torch.tensor(q_enc), opts, torch.tensor(int(pid))
+        return im, qa, opts, torch.tensor(int(pid))
 
     def __len__(self):
         return len(self.puzzles)

@@ -497,7 +497,7 @@ def load_pretrained_models(args, model_name, model=None):
         weights = ResNet50_Weights.DEFAULT
         preprocess = weights.transforms()
         model = resnet50(weights=None)
-        pretrained_weights = torch.load("/checkpoints/resnet50-11ad3fa6.pth")
+        pretrained_weights = torch.load("./checkpoints/resnet50-11ad3fa6.pth")
         model.load_state_dict(pretrained_weights, strict=True)
     elif args.model_name == "swin_t":  # use_vit:
         from torchvision.models import Swin_T_Weights, swin_t
