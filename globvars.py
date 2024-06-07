@@ -115,19 +115,3 @@ def globals_init(args):
 
     if not os.path.exists(args.save_root):
         os.makedirs(args.save_root)
-
-    # if gpt2
-    if args.word_embed == "glove":
-        Embed = GloVe()
-        word_dim = Embed.get_word_dim()
-        word_embed = Embed.word_embed
-    elif args.word_embed == "gpt":
-        Embed = GPT2()
-        word_dim = Embed.get_word_dim()
-        word_embed = Embed.word_embed
-    elif args.word_embed == "bert":
-        Embed = BERT()
-        word_dim = Embed.get_word_dim()
-        word_embed = Embed.word_embed
-    else:
-        print("word embedding used is %s" % (args.word_embed))

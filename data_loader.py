@@ -353,11 +353,6 @@ class SMART_Challenge_Data(SMART_Data):
         #im = self.apply_transform(gv.osp(self.data_root, 'test-images', puzzle["Image"]))
         im = Image.open(gv.osp(self.data_root, 'test-images', puzzle["Image"]))
         qa = puzzle["Question"]#) #self.quest_encode()
-        
-        q_enc = torch.zeros(gv.max_qlen, gv.word_dim)
-        q_feat = gv.word_embed(qa)
-        q_enc[:min(gv.max_qlen, len(q_feat)), :] = q_feat
-
         opts = [puzzle[key] for key in ["A", "B", "C", "D", "E"]]
         return gv.osp(self.data_root, 'test-images', puzzle["Image"]), qa, opts, torch.tensor(int(pid))
 

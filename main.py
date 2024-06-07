@@ -375,45 +375,5 @@ if __name__ == "__main__":
 
     gv.globals_init(args)
     
-    im_backbone, preprocess = net.load_pretrained_models(args, args.model_name, model=None)
-    args.preprocess = preprocess
-
-    if not args.challenge:
-        args.puzzle_ids_str, args.puzzle_ids = utils.get_puzzle_ids(args)
-        args.location = os.path.join(args.save_root, "checkpoints")
-        args.log_path = os.path.join(args.save_root, "log")
-    
-        reset_state(args)
-        
-        gv.NUM_CLASSES_PER_PUZZLE = utils.get_puzzle_class_info(
-            args
-        )  # initialize the global with the number of outputs for each puzzle.
-    
-        vocab = vocab_utils.process_text_for_puzzle(args)
-        if args.vocab_path == "none":
-            args.vocab_path = os.path.join(args.save_root, "vocab_puzzle_" + args.puzzle_ids_str + ".pkl")
-    
-        train_loader = get_data_loader(
-            args, "train", batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers
-        )
-        val_loader = get_data_loader(args, "val", batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
-        test_loader = get_data_loader(args, "test", batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
-        
-    
-        dataloader = {
-            "train": train_loader,
-            "valid": val_loader,
-            "test": test_loader,
-        }
-    
-        utils.backup_code_and_start_logger(args, args.log_path, args.seed)
-    
-        print(args)
-        print("num_puzzles=%d" % (len(args.puzzle_ids)))
-        
-        train(args, dataloader, im_backbone)
-        
-    elif args.challenge: # if we are using the VLAR challenge evaluation
+    if args.challenge: # if we are using the VLAR challenge evaluation
         VLAR.predict_on_challenge_data(args, args.pretrained_model_path, challenge_phase=args.phase)
-        
-    

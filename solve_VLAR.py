@@ -280,7 +280,7 @@ def predict_on_challenge_data(args, pretrained_model_path, challenge_phase='val'
     model, processor = get_SMART_solver_model(args, pretrained_model_path) # provide the model for evaluation.
     model.eval()
     model.to(gv.device)
-    
+    args.preprocess = None # We use our own processor.
     challenge_loader = get_data_loader(args, "challenge", batch_size=1, shuffle=False, num_workers=0) 
     
     print('making predictions using the model')

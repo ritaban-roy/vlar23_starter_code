@@ -21,7 +21,7 @@ WORKDIR /smart
 
 RUN mkdir -p ./checkpoints/
 
-ADD checkpoints/BERT  ./checkpoints/BERT
+#ADD checkpoints/BERT  ./checkpoints/BERT
 ADD dataset  ./dataset
 
 COPY requirements.txt requirements.txt
@@ -42,8 +42,8 @@ ADD checkpoints/bakLlava-v1-hf ./checkpoints/bakLlava-v1-hf
 ADD checkpoints/llava_dpt_1 ./checkpoints/llava_dpt_1
 COPY data/icon-classes.txt  ./checkpoints/icon-classes.txt  
 COPY data/SMART_info_v2.csv ./checkpoints/SMART_info_v2.csv
-COPY checkpoints/ckpt_resnet50_bert_212.pth ./checkpoints/ckpt_resnet50_bert_212.pth
-COPY checkpoints/resnet50-11ad3fa6.pth ./checkpoints/resnet50-11ad3fa6.pth
+#COPY checkpoints/ckpt_resnet50_bert_212.pth ./checkpoints/ckpt_resnet50_bert_212.pth
+#COPY checkpoints/resnet50-11ad3fa6.pth ./checkpoints/resnet50-11ad3fa6.pth
 
 CMD ["python", "main.py", "--model_name", "resnet50", "--num_workers", "0", "--loss_type", "classifier", "--word_embed", "bert", "--split_type", "puzzle", "--challenge", "--phase", "val", "--pretrained_model_path", "./checkpoints/ckpt_resnet50_bert_212.pth"]
 
