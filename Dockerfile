@@ -1,20 +1,23 @@
 FROM python:3.8-slim-buster
 #FROM anibali/pytorch:1.7.0-cuda11.0-ubuntu20.04
-FROM anibali/pytorch:1.10.0-cuda11.3
+#FROM anibali/pytorch:1.10.0-cuda11.3
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Moscow
 # Install system libraries required by OpenCV.
-USER root
+#USER root
 
 RUN apt-get -y update 
 RUN apt-get -y install git
 RUN mkdir /smart
 RUN chown 1001:1001 /smart
+RUN export BNB_CUDA_VERSION=117
 
 WORKDIR /smart
 
-USER 1001
+#USER 1001
+
 
 RUN mkdir -p ./checkpoints/
 
@@ -35,8 +38,8 @@ COPY build_vocab.py	./build_vocab.py
 COPY globvars.py	 ./globvars.py
 COPY utils.py ./utils.py
 
-ADD bakLlava-v1-hf ./checkpoints/bakLlava-v1-hf
-ADD llava_dpt_1 ./checkpoints/llava_dpt_1
+ADD checkpoints/bakLlava-v1-hf ./checkpoints/bakLlava-v1-hf
+ADD checkpoints/llava_dpt_1 ./checkpoints/llava_dpt_1
 COPY data/icon-classes.txt  ./checkpoints/icon-classes.txt  
 COPY data/SMART_info_v2.csv ./checkpoints/SMART_info_v2.csv
 COPY checkpoints/ckpt_resnet50_bert_212.pth ./checkpoints/ckpt_resnet50_bert_212.pth

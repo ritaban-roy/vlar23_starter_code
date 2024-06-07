@@ -38,11 +38,14 @@ import time
 import net
 import data_loader as dl
 import globvars as gv
+from PIL import Image
 
 import transformers
 from peft import PeftModelForCausalLM, PeftConfig, AutoPeftModelForCausalLM
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 from transformers import BitsAndBytesConfig
+import torchvision
+
 
 class CustomLLaVAModel(LlavaForConditionalGeneration):
   def __init__(self, config):
@@ -218,19 +221,27 @@ def make_predictions(challenge_loader, model, processor):
     responses = {}
     ops = ["A", "B", "C", "D", "E"]
     with torch.no_grad():
-        for i, (im, q, opts, pid) in enumerate(challenge_loader):
-            im = im.to(gv.device)
-            q = q.to(gv.device)
-            prompt = "USER: <image>\n {} \nOptions: {} \nASSISTANT: ".format(q, " ".join(["({}) {}".format(opt, str(val)) for opt, val in zip(ops, opts)]))
-            inputs = processor(images=im, text=prompt, padding=True, return_tensors="pt").to(gv.device)
+        for i, (im, qx, opts, pid) in enumerate(challenge_loader):
+            #Change
+            #im = (im - im.min()) / (im.max() - im.min())
+            #im = im.to(gv.device)
+            #import pdb; pdb.set_trace()
+            #q = qx.to(gv.device)
+            prompt = "USER: <image>\n {} \nOptions: {} \nASSISTANT: ".format(qx[0], " ".join(["({}) {}".format(opt, str(val[0])) for opt, val in zip(ops, opts)]))
+            inputs = processor(images=Image.open(im[0]), text=prompt, padding=True, return_tensors="pt").to(gv.device)
             with torch.no_grad():
-                predictions = model.generate(**inputs, max_new_tokens=5)
-            answer = processor.decode(predictions[0], skip_special_tokens=True).strip()
-            if answer[0].isnumeric():
-                selected_opt = np.abs(np.array([int(opt[0]) for opt in opts])-answer).argmin() # answers are digits.
+                predictions = model.generate(**inputs, max_new_tokens=3)
+            answer = processor.decode(predictions[0], skip_special_tokens=True)
+            answer = answer.split('ASSISTANT: ')[-1].strip(' () ')
+            if answer.isnumeric():
+                #import pdb; pdb.set_trace()
+                selected_opt = np.abs(np.array([int(opt[0]) for opt in opts])-int(answer)).argmin() # answers are digits.
+                responses[str(pid[0].item())] = chr(ord('A') + selected_opt)
             else:
-                selected_opt = np.abs(np.array([ord(opt[0]) for opt in opts])-answer[0]).argmin() # result is a letter
-            responses[str(pid[0].item())] = chr(ord('A') + selected_opt)
+                #import pdb; pdb.set_trace()
+                if len(answer) > 1:
+                    answer = answer[0]
+                responses[str(pid[0].item())] = answer[0]
     return responses
 
 def make_response_json(challenge_loader, responses):
@@ -265,7 +276,7 @@ def get_data_loader(args, split, batch_size=100, shuffle=True, num_workers=6, pi
 def predict_on_challenge_data(args, pretrained_model_path, challenge_phase='val'):
     args.puzzles_file = 'VLAR-val.json' if challenge_phase == 'val' else 'VLAR-test.json'
         
-    print('loading model ...');
+    print('loading model ...')
     model, processor = get_SMART_solver_model(args, pretrained_model_path) # provide the model for evaluation.
     model.eval()
     model.to(gv.device)
